@@ -3,6 +3,7 @@ package actions.defaultActions;
 import actions.Action;
 import actions.ActionFactory;
 import actions.CharacterAction;
+import actions.IntegralAction;
 import book.Direction;
 import book.Location;
 import book.StackProxy;
@@ -17,19 +18,11 @@ public class DefaultActions {
     static {
         actions = new HashMap<>();
 
-        addAction(ActionFactory.makeAction('+', b -> {
-            StackProxy s = b.stack();
-            int A = s.pop();
-            int B = s.pop();
-            s.push(A + B);
-        }));
-
-        addAction(ActionFactory.makeAction('-', b -> {
-            StackProxy s = b.stack();
-            int A = s.pop();
-            int B = s.pop();
-            s.push(-A + B);
-        }));
+        addAction(new IntegralAction('+', (b,a)->a+b));
+        addAction(new IntegralAction('-', (b,a)->a-b));
+        addAction(new IntegralAction('/', (b,a)->a/b));
+        addAction(new IntegralAction('*', (b,a)->a*b));
+        addAction(new IntegralAction('%', (b,a)->a%b));
 
         addAction(ActionFactory.makeAction('|', b -> {
             StackProxy s = b.stack();
@@ -50,9 +43,7 @@ public class DefaultActions {
                 b.stack().push(o);
         }));
 
-        addAction(ActionFactory.makeAction('p', b -> {
-            b.pushOutput(b.stack().pop());
-        }));
+        addAction(ActionFactory.makeAction('p', b -> b.pushOutput(b.stack().pop())));
 
         addAction(ActionFactory.makeAction('P', b -> {
             StringBuilder s = new StringBuilder();
