@@ -3,6 +3,8 @@ package book;
 import actions.defaultActions.DefaultActions;
 import exceptions.NoStartingPointException;
 
+import java.util.*;
+
 /**
  * A book bound by a width and a height
  */
@@ -17,11 +19,14 @@ public class BoundedBook extends Book {
 
     private boolean gettingNumber;
 
+    private List<Location> previousLocations;
+
     public BoundedBook (int width, int height) {
         this.width = width;
         this.height = height;
         stackProxy = new StackProxy();
         codes = new char[height][width];
+        previousLocations = new ArrayList<>();
     }
 
     @Override
@@ -94,5 +99,17 @@ public class BoundedBook extends Book {
     @Override
     public StackProxy stack () {
         return stackProxy;
+    }
+
+    @Override
+    public void gotoMethod (Location location) {
+        previousLocations.add(pointer);
+        movePointer(location.over(-1, direction));
+    }
+
+    @Override
+    public void finishMethod () {
+        // EXPERIMENT !!
+        movePointer(previousLocations.remove(0));
     }
 }

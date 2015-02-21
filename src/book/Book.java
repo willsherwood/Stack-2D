@@ -28,4 +28,14 @@ public abstract class Book {
     public abstract StackProxy stack();
 
     public abstract void pushOutput (Object pop);
+
+    /**
+     *  executes the method at location location
+     */
+    public abstract void gotoMethod (Location location);
+
+    /**
+     *  finishes the current method
+     */
+    public abstract void finishMethod();
 }

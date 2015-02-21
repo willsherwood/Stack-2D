@@ -46,7 +46,7 @@ public class DefaultActions {
 
         addAction(ActionFactory.makeAction('$', b -> {
             Object o = b.stack().pop();
-            for (int i=0; i<2; i++)
+            for (int i = 0; i < 2; i++)
                 b.stack().push(o);
         }));
 
@@ -63,12 +63,26 @@ public class DefaultActions {
 
         addAction(new NullAction('s'));
         addAction(new NullAction(' '));
-        addAction(new NullAction((char)0));
+        addAction(new NullAction((char) 0));
 
         addAction(ActionFactory.makeAction('t', b -> {
             int y = b.stack().pop();
             int x = b.stack().pop();
             b.movePointer(new Location(x, y));
+        }));
+
+        addAction(ActionFactory.makeAction('=', b -> {
+            b.stack().push(b.stack().pop().equals(b.stack().pop()) ? 1 : 0);
+        }));
+
+        addAction(ActionFactory.makeAction('.', b -> {
+            int y = b.stack().pop();
+            int x = b.stack().pop();
+            b.gotoMethod(new Location(x , y));
+        }));
+
+        addAction(ActionFactory.makeAction(',', b -> {
+            b.finishMethod();
         }));
 
         addAction(new DirectionalAction('v', Direction.DOWN));
@@ -77,7 +91,7 @@ public class DefaultActions {
         addAction(new DirectionalAction('>', Direction.RIGHT));
     }
 
-    public static void addAction(CharacterAction action) {
+    public static void addAction (CharacterAction action) {
         actions.put(action.getAssociatedCharacter(), action);
     }
 
