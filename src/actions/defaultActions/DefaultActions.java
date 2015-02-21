@@ -38,7 +38,7 @@ public class DefaultActions {
             if (p instanceof Boolean)
                 out = (boolean) p;
             if (p instanceof Integer)
-                out = ((int) p) != 0;
+                out = ((int) p) > 0;
             if (p instanceof String)
                 out = !((String) p).isEmpty();
             b.switchDirection(out ? Direction.UP : Direction.DOWN);
@@ -57,7 +57,7 @@ public class DefaultActions {
         addAction(ActionFactory.makeAction('P', b -> {
             StringBuilder s = new StringBuilder();
             while (!b.stack().isEmpty())
-                s.append(b.stack().pop().toString());
+                s.append(b.stack().pop().toString()+", ");
             b.pushOutput(s.toString());
         }));
 
@@ -83,6 +83,11 @@ public class DefaultActions {
 
         addAction(ActionFactory.makeAction(',', b -> {
             b.finishMethod();
+        }));
+
+        addAction(ActionFactory.makeAction('"', b -> {
+            b.inputString();
+            b.stack().push("");
         }));
 
         addAction(new DirectionalAction('v', Direction.DOWN));

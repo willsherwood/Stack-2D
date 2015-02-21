@@ -18,6 +18,7 @@ public class BoundedBook extends Book {
     private StackProxy stackProxy;
 
     private boolean gettingNumber;
+    private boolean gettingString;
 
     private List<Location> previousLocations;
 
@@ -33,7 +34,7 @@ public class BoundedBook extends Book {
     public void run () {
         movePointer(startingPoint());
         switchDirection(Direction.RIGHT);
-        while(step());
+        while (step()) ;
     }
 
     @Override
@@ -44,7 +45,7 @@ public class BoundedBook extends Book {
     /**
      * @return whether or not the program has exited
      */
-    private boolean step() {
+    private boolean step () {
         process(codes[pointer.y][pointer.x]);
         movePointer(pointer.over(1, direction));
         return locationInBounds(pointer);
@@ -55,6 +56,17 @@ public class BoundedBook extends Book {
     }
 
     private void process (char c) {
+        if (gettingString) {
+            if (c == '"')
+                gettingString = false;
+            else {
+                if (stack().isEmpty())
+                    stack().push(c);
+                else
+                    stack().push(stack().pop().toString() + c);
+            }
+            return;
+        }
         if (c >= '0' && c <= '9') {
             getNumber(c);
             return;
@@ -73,9 +85,9 @@ public class BoundedBook extends Book {
         stackProxy.push(c - 48);
     }
 
-    private Location startingPoint() {
-        for (int y=0; y<height; y++)
-            for (int x=0; x<width; x++)
+    private Location startingPoint () {
+        for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
                 if (codes[y][x] == 's')
                     return new Location(x, y);
         throw new NoStartingPointException();
@@ -95,7 +107,7 @@ public class BoundedBook extends Book {
     public void switchDirection (Direction direction) {
         this.direction = direction;
     }
-    
+
     @Override
     public StackProxy stack () {
         return stackProxy;
@@ -110,6 +122,11 @@ public class BoundedBook extends Book {
     @Override
     public void finishMethod () {
         // EXPERIMENT !!
-        movePointer(previousLocations.remove(0));
+        movePointer(previousLocations.remove(previousLocations.size() - 1));
+    }
+
+    @Override
+    public void inputString () {
+        gettingString = true;
     }
 }

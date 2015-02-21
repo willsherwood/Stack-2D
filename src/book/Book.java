@@ -38,4 +38,6 @@ public abstract class Book {
      *  finishes the current method
      */
     public abstract void finishMethod();
+
+    public abstract void inputString ();
 }
