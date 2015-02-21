@@ -35,9 +35,9 @@ public class Location {
     }
 
     /**
-     *  returns a location "over" amount spaces in the direction direction.
+     * returns a location "over" amount spaces in the direction direction.
      */
-    public Location over(int amount, Direction direction) {
+    public Location over (int amount, Direction direction) {
         return new Location(x + amount * direction.dx, y + amount * direction.dy);
     }
 }

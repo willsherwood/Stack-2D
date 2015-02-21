@@ -1,6 +1,5 @@
-package actions.defaultActions;
+package actions;
 
-import actions.CharacterAction;
 import book.Book;
 import book.Direction;
 

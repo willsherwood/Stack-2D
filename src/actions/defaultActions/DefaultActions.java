@@ -1,9 +1,6 @@
 package actions.defaultActions;
 
-import actions.Action;
-import actions.ActionFactory;
-import actions.CharacterAction;
-import actions.IntegralAction;
+import actions.*;
 import book.Direction;
 import book.Location;
 import book.StackProxy;
@@ -18,16 +15,21 @@ public class DefaultActions {
     static {
         actions = new HashMap<>();
 
-        addAction(new IntegralAction('+', (b,a)->a+b));
-        addAction(new IntegralAction('-', (b,a)->a-b));
-        addAction(new IntegralAction('/', (b,a)->a/b));
-        addAction(new IntegralAction('*', (b,a)->a*b));
-        addAction(new IntegralAction('%', (b,a)->a%b));
-        addAction(new IntegralAction('^', (b,a)->a^b));
-        addAction(new IntegralAction('&', (b,a)->a&b));
-        addAction(new IntegralAction('\\', (b,a)->a|b));
+        addAction(new IntegralAction('+', (b, a) -> a + b));
+        addAction(new IntegralAction('-', (b, a) -> a - b));
+        addAction(new IntegralAction('/', (b, a) -> a / b));
+        addAction(new IntegralAction('*', (b, a) -> a * b));
+        addAction(new IntegralAction('%', (b, a) -> a % b));
+        addAction(new IntegralAction('^', (b, a) -> a ^ b));
+        addAction(new IntegralAction('&', (b, a) -> a & b));
+        addAction(new IntegralAction('\\', (b, a) -> a | b));
+        addAction(new IntegralAction('=', (b, a) -> a == b ? 1 : 0));
+        addAction(new IntegralAction('g', (b, a) -> a > b ? 1 : 0));
+        addAction(new IntegralAction('G', (b, a) -> a >= b ? 1 : 0));
+        addAction(new IntegralAction('l', (b, a) -> a < b ? 1 : 0));
+        addAction(new IntegralAction('L', (b, a) -> a <= b ? 1 : 0));
 
-        addAction(ActionFactory.makeAction('~', b->b.stack().push(~(int)b.stack().pop())));
+        addAction(ActionFactory.makeAction('~', b -> b.stack().push(~(int) b.stack().pop())));
 
         addAction(ActionFactory.makeAction('|', b -> {
             StackProxy s = b.stack();
@@ -53,7 +55,7 @@ public class DefaultActions {
         addAction(ActionFactory.makeAction('P', b -> {
             StringBuilder s = new StringBuilder();
             while (!b.stack().isEmpty())
-                s.append(b.stack().pop().toString()+", ");
+                s.append(b.stack().pop().toString() + ", ");
             b.pushOutput(s.toString());
         }));
 
@@ -67,14 +69,11 @@ public class DefaultActions {
             b.movePointer(new Location(x, y));
         }));
 
-        addAction(ActionFactory.makeAction('=', b -> {
-            b.stack().push(b.stack().pop().equals(b.stack().pop()) ? 1 : 0);
-        }));
 
         addAction(ActionFactory.makeAction('.', b -> {
             int y = b.stack().pop();
             int x = b.stack().pop();
-            b.gotoMethod(new Location(x , y));
+            b.gotoMethod(new Location(x, y));
         }));
 
         addAction(ActionFactory.makeAction(',', b -> {

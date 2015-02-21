@@ -10,6 +10,7 @@ public class ActionFactory {
             public char getAssociatedCharacter () {
                 return associatedCharacter;
             }
+
             @Override
             public void process (Book book) {
                 action.process(book);
