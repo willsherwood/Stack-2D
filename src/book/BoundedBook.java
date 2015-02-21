@@ -12,21 +12,18 @@ public class BoundedBook extends Book {
     private char[][] codes;
     private Location pointer;
     private Direction direction;
+    private StackProxy stackProxy;
 
     public BoundedBook (int width, int height) {
         this.width = width;
         this.height = height;
-    }
-
-    @Override
-    public void addCode (Location loc, char c) {
-        codes[loc.y][loc.x] = c;
+        stackProxy = new StackProxy();
     }
 
     @Override
     public void run () {
-        pointer = startingPoint();
-        direction = Direction.RIGHT;
+        movePointer(startingPoint());
+        switchDirection(Direction.RIGHT);
         while(step());
     }
 
@@ -44,7 +41,7 @@ public class BoundedBook extends Book {
     }
 
     private void process (char c) {
-        // TODO
+
     }
 
     private Location startingPoint() {
@@ -53,5 +50,25 @@ public class BoundedBook extends Book {
                 if (codes[y][x] == 'S')
                     return new Location(x, y);
         throw new NoStartingPointException();
+    }
+
+    @Override
+    public void addCode (Location loc, char c) {
+        codes[loc.y][loc.x] = c;
+    }
+
+    @Override
+    public void movePointer (Location loc) {
+        this.pointer = loc;
+    }
+
+    @Override
+    public void switchDirection (Direction direction) {
+        this.direction = direction;
+    }
+    
+    @Override
+    public StackProxy stack () {
+        return stackProxy;
     }
 }
