@@ -10,7 +10,12 @@ public abstract class Book {
      */
     public abstract void addCode (Location loc, char c);
 
-    public abstract void run ();
+    public abstract void start ();
+
+    /**
+     * @return whether or not the program has exited
+     */
+    public abstract boolean step ();
 
     /**
      * moves the code pointer to a new location

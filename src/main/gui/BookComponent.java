@@ -1,21 +1,30 @@
 package main.gui;
 
-import book.Direction;
-import book.Location;
+import book.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.Queue;
 
 public class BookComponent extends JComponent {
 
     public final int CELL_SIZE = 20;
     private int cellHeight, cellWidth;
 
+    private char[][] map;
+
     private Location pointer;
     private Direction direction;
+
+    private Book book;
+    private Queue<Drawable> drawables;
+
+    public StackProxy stack() {
+        return book.stack();
+    }
 
     private static Map<Integer, Direction> associatedDirections;
 
@@ -23,6 +32,9 @@ public class BookComponent extends JComponent {
         recalculateCellSizes();
         pointer = new Location(cellWidth / 2, cellHeight / 2);
         direction = Direction.RIGHT;
+        book = new BoundedBook(1, 1);
+        map = new char[1][1];
+        drawables = new LinkedList<>();
     }
 
     static {
@@ -34,16 +46,47 @@ public class BookComponent extends JComponent {
     }
 
     public void sendKey (int keyCode) {
+        if (keyCode == KeyEvent.VK_BACK_SPACE) {
+            shiftPointer(-1);
+            map[pointer.y][pointer.x] = 0;
+            paint(getGraphics());
+            return;
+        } else if (keyCode == KeyEvent.VK_F5) {
+            addAll();
+            SwingUtilities.invokeLater(()-> {
+                book.start();
+                while(book.step()) {
+                    pointer = book.currentPointer();
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    paint(getGraphics());
+                }
+            });
+            return;
+        } else if (keyCode == KeyEvent.VK_TAB) {
+            drawables.add(new Notification(new Location(pointer.x * CELL_SIZE, pointer.y * CELL_SIZE), "Coordinate: ", 400));
+            return;
+        }
         if (keyCode < 32)
             return;
+
         if (associatedDirections.containsKey(keyCode)) {
-            pointer = pointer.over(1, associatedDirections.get(keyCode));
-            direction = Direction.RIGHT;
+            direction = associatedDirections.get(keyCode);
+            shiftPointer(1);
         } else {
-            System.out.println(keyCode);
-            pointer = pointer.over(1, direction);
+            map[pointer.y][pointer.x] = (char) keyCode;
+            shiftPointer(1);
         }
         paint(getGraphics());
+    }
+
+    public void shiftPointer(int amt) {
+        pointer = pointer.over(amt, direction);
+        if (pointer.x<0 || pointer.y<0 || pointer.x >= cellWidth || pointer.y >= cellHeight)
+            pointer = pointer.over(-amt, direction);
     }
 
     @Override
@@ -62,6 +105,19 @@ public class BookComponent extends JComponent {
             g.drawLine(x * CELL_SIZE, 0, x * CELL_SIZE, getHeight());
         g.setColor(Color.GREEN);
         g.drawRect(pointer.x * CELL_SIZE, pointer.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        for (int y = 0; y < cellHeight; y++)
+            for (int x = 0; x < cellWidth; x++)
+                if (map[y][x] != 0)
+                    g.drawString(map[y][x] + "", x * CELL_SIZE + 4, y * (CELL_SIZE) + CELL_SIZE - 4);
+        Iterator<Drawable> p = drawables.iterator();
+        while (p.hasNext()) {
+            Drawable t = p.next();
+            t.draw(g);
+            if (t instanceof Destructable) {
+                if (((Destructable)t).isDestroyed())
+                    p.remove();
+            }
+        }
     }
 
     @Override
@@ -70,7 +126,20 @@ public class BookComponent extends JComponent {
     }
 
     private void recalculateCellSizes () {
-        cellHeight = getHeight() / CELL_SIZE;
-        cellWidth = getWidth() / CELL_SIZE;
+        int cellHeight = getHeight() / CELL_SIZE;
+        int cellWidth = getWidth() / CELL_SIZE;
+        if (cellHeight != this.cellHeight || cellWidth != this.cellWidth) {
+            map = new char[cellHeight][cellWidth];
+            System.out.println(cellWidth);
+            this.cellWidth = cellWidth;
+            this.cellHeight = cellHeight;
+            book = new BoundedBook(cellWidth, cellHeight);
+        }
+    }
+
+    private void addAll () {
+        for (int y = 0; y < cellHeight; y++)
+            for (int x = 0; x < cellWidth; x++)
+                book.addCode(new Location(x, y), map[y][x]);
     }
 }

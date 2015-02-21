@@ -37,6 +37,6 @@ public class Main {
             for (int x = 0; x < maxX; x++)
                 if (x < p[y].length)
                     b.addCode(new Location(x, y), p[y][x]);
-        b.run();
+        b.start();
     }
 }

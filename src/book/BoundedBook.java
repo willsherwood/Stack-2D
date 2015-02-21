@@ -31,10 +31,9 @@ public class BoundedBook extends Book {
     }
 
     @Override
-    public void run () {
+    public void start () {
         movePointer(startingPoint());
         switchDirection(Direction.RIGHT);
-        while (step()) ;
     }
 
     @Override
@@ -42,10 +41,7 @@ public class BoundedBook extends Book {
         System.out.println(pop);
     }
 
-    /**
-     * @return whether or not the program has exited
-     */
-    private boolean step () {
+    public boolean step () {
         process(codes[pointer.y][pointer.x]);
         movePointer(pointer.over(1, direction));
         return locationInBounds(pointer);
