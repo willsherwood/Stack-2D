@@ -1,5 +1,6 @@
 package book;
 
+import actions.defaultActions.DefaultActions;
 import exceptions.NoStartingPointException;
 
 /**
@@ -14,10 +15,13 @@ public class BoundedBook extends Book {
     private Direction direction;
     private StackProxy stackProxy;
 
+    private boolean gettingNumber;
+
     public BoundedBook (int width, int height) {
         this.width = width;
         this.height = height;
         stackProxy = new StackProxy();
+        codes = new char[height][width];
     }
 
     @Override
@@ -27,13 +31,18 @@ public class BoundedBook extends Book {
         while(step());
     }
 
+    @Override
+    public void pushOutput (Object pop) {
+        System.out.println(pop);
+    }
+
     /**
      * @return whether or not the program has exited
      */
     private boolean step() {
         process(codes[pointer.y][pointer.x]);
-        pointer = pointer.over(1, direction);
-        return !locationInBounds(pointer);
+        movePointer(pointer.over(1, direction));
+        return locationInBounds(pointer);
     }
 
     private boolean locationInBounds (Location loc) {
@@ -41,13 +50,28 @@ public class BoundedBook extends Book {
     }
 
     private void process (char c) {
+        if (c >= '0' && c <= '9') {
+            getNumber(c);
+            return;
+        }
+        gettingNumber = false;
+        DefaultActions.getAction(c).process(this);
+    }
 
+    private void getNumber (char c) {
+        if (gettingNumber) {
+            int current = stackProxy.pop();
+            stackProxy.push(current * 10 + (c - 48));
+            return;
+        }
+        gettingNumber = true;
+        stackProxy.push(c - 48);
     }
 
     private Location startingPoint() {
         for (int y=0; y<height; y++)
             for (int x=0; x<width; x++)
-                if (codes[y][x] == 'S')
+                if (codes[y][x] == 's')
                     return new Location(x, y);
         throw new NoStartingPointException();
     }

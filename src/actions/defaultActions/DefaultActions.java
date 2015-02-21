@@ -42,6 +42,31 @@ public class DefaultActions {
                 out = !((String) p).isEmpty();
             b.switchDirection(out ? Direction.UP : Direction.DOWN);
         }));
+
+        addAction(ActionFactory.makeAction('$', b -> {
+            Object o = b.stack().pop();
+            for (int i=0; i<2; i++)
+                b.stack().push(o);
+        }));
+
+        addAction(ActionFactory.makeAction('p', b -> {
+            b.pushOutput(b.stack().pop());
+        }));
+
+        addAction(ActionFactory.makeAction('P', b -> {
+            StringBuilder s = new StringBuilder();
+            while (!b.stack().isEmpty())
+                s.append(b.stack().pop().toString());
+            b.pushOutput(s.toString());
+        }));
+
+        addAction(ActionFactory.makeAction('s', b-> {
+
+        }));
+
+        addAction(ActionFactory.makeAction(' ', b-> {
+
+        }));
     }
 
     public static void addAction(CharacterAction action) {

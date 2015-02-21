@@ -26,4 +26,6 @@ public abstract class Book {
      *  returns the stack proxy
      */
     public abstract StackProxy stack();
+
+    public abstract void pushOutput (Object pop);
 }

@@ -17,4 +17,8 @@ public class StackProxy {
     public <K> void push(K k) {
         stack.push(k);
     }
+
+    public boolean isEmpty() {
+        return stack.isEmpty();
+    }
 }
