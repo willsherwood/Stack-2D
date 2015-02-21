@@ -4,6 +4,7 @@ import actions.Action;
 import actions.ActionFactory;
 import actions.CharacterAction;
 import book.Direction;
+import book.Location;
 import book.StackProxy;
 import exceptions.CodeNotSupportedException;
 
@@ -60,13 +61,20 @@ public class DefaultActions {
             b.pushOutput(s.toString());
         }));
 
-        addAction(ActionFactory.makeAction('s', b-> {
+        addAction(new NullAction('s'));
+        addAction(new NullAction(' '));
+        addAction(new NullAction((char)0));
 
+        addAction(ActionFactory.makeAction('t', b -> {
+            int y = b.stack().pop();
+            int x = b.stack().pop();
+            b.movePointer(new Location(x, y));
         }));
 
-        addAction(ActionFactory.makeAction(' ', b-> {
-
-        }));
+        addAction(new DirectionalAction('v', Direction.DOWN));
+        addAction(new DirectionalAction('^', Direction.UP));
+        addAction(new DirectionalAction('<', Direction.LEFT));
+        addAction(new DirectionalAction('>', Direction.RIGHT));
     }
 
     public static void addAction(CharacterAction action) {
