@@ -15,6 +15,10 @@ public class StackProxy {
         return stackMode == StackMode.PEEK ? (K) stack.peek() : (K) stack.pop();
     }
 
+    public Stack<Object> contents () {
+        return (Stack<Object>) stack.clone();
+    }
+
     public <K> void push (K k) {
         stack.push(k);
     }

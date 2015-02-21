@@ -19,7 +19,9 @@ public class Notification implements Drawable, Destructable {
 
     @Override
     public void draw (Graphics g) {
+        g.setColor(Color.DARK_GRAY);
         g.fillRect(loc.x, loc.y, 100, 40);
+        g.setColor(Color.WHITE);
         g.drawString(text, loc.x+4, loc.y+38);
     }
 

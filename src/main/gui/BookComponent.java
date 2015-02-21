@@ -46,6 +46,7 @@ public class BookComponent extends JComponent {
     }
 
     public void sendKey (int keyCode) {
+        System.out.println(keyCode);
         if (keyCode == KeyEvent.VK_BACK_SPACE) {
             shiftPointer(-1);
             map[pointer.y][pointer.x] = 0;
@@ -55,6 +56,14 @@ public class BookComponent extends JComponent {
             addAll();
             SwingUtilities.invokeLater(()-> {
                 book.start();
+                JFrame frame = new JFrame();
+                JPanel panel = new JPanel();
+                frame.getContentPane().add(panel);
+                StackVisualizationComponent stackVisualizationComponent = new StackVisualizationComponent();
+                panel.add(stackVisualizationComponent);
+                frame.pack();
+                frame.setLocationRelativeTo(this);
+                frame.setVisible(true);
                 while(book.step()) {
                     pointer = book.currentPointer();
                     try {
@@ -63,11 +72,13 @@ public class BookComponent extends JComponent {
                         e.printStackTrace();
                     }
                     paint(getGraphics());
+                    stackVisualizationComponent.paint(frame.getGraphics(), book.stack().contents());
                 }
             });
             return;
-        } else if (keyCode == KeyEvent.VK_TAB) {
-            drawables.add(new Notification(new Location(pointer.x * CELL_SIZE, pointer.y * CELL_SIZE), "Coordinate: ", 400));
+        } else if (keyCode == KeyEvent.VK_CONTROL) {
+            drawables.add(new Notification(new Location(pointer.x * CELL_SIZE - 2 * CELL_SIZE, pointer.y * CELL_SIZE - 2 * CELL_SIZE), "Coordinate: " + pointer, 4000));
+            paint(getGraphics());
             return;
         }
         if (keyCode < 32)
@@ -133,11 +144,11 @@ public class BookComponent extends JComponent {
             System.out.println(cellWidth);
             this.cellWidth = cellWidth;
             this.cellHeight = cellHeight;
-            book = new BoundedBook(cellWidth, cellHeight);
         }
     }
 
     private void addAll () {
+        book = new BoundedBook(cellWidth, cellHeight);
         for (int y = 0; y < cellHeight; y++)
             for (int x = 0; x < cellWidth; x++)
                 book.addCode(new Location(x, y), map[y][x]);
