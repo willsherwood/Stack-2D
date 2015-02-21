@@ -3,7 +3,9 @@ package main;
 import book.Book;
 import book.BoundedBook;
 import book.Location;
+import main.gui.BookDesigner;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -20,6 +22,9 @@ public class Main {
             process(out);
             return;
         }
+
+        SwingUtilities.invokeLater(()->new BookDesigner());
+
     }
 
     public static void process (char[][] p) {
