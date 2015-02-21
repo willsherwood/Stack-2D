@@ -23,6 +23,11 @@ public class DefaultActions {
         addAction(new IntegralAction('/', (b,a)->a/b));
         addAction(new IntegralAction('*', (b,a)->a*b));
         addAction(new IntegralAction('%', (b,a)->a%b));
+        addAction(new IntegralAction('^', (b,a)->a^b));
+        addAction(new IntegralAction('&', (b,a)->a&b));
+        addAction(new IntegralAction('\\', (b,a)->a|b));
+
+        addAction(ActionFactory.makeAction('~', b->b.stack().push(~(int)b.stack().pop())));
 
         addAction(ActionFactory.makeAction('|', b -> {
             StackProxy s = b.stack();
@@ -85,6 +90,10 @@ public class DefaultActions {
         addAction(new DirectionalAction('^', Direction.UP));
         addAction(new DirectionalAction('<', Direction.LEFT));
         addAction(new DirectionalAction('>', Direction.RIGHT));
+
+        addAction(ActionFactory.makeAction('#', b -> {
+            b.movePointer(b.currentPointer().over(1, b.currentDirection()));
+        }));
     }
 
     public static void addAction (CharacterAction action) {

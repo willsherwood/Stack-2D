@@ -121,12 +121,21 @@ public class BoundedBook extends Book {
 
     @Override
     public void finishMethod () {
-        // EXPERIMENT !!
         movePointer(previousLocations.remove(previousLocations.size() - 1));
     }
 
     @Override
     public void inputString () {
         gettingString = true;
+    }
+
+    @Override
+    public Location currentPointer () {
+        return pointer;
+    }
+
+    @Override
+    public Direction currentDirection () {
+        return direction;
     }
 }
