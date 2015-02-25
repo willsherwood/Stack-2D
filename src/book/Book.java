@@ -49,4 +49,6 @@ public abstract class Book {
     public abstract Location currentPointer ();
 
     public abstract Direction currentDirection ();
+
+    public abstract void executeMethod(int identifier);
 }

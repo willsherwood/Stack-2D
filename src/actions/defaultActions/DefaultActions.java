@@ -6,7 +6,8 @@ import book.Location;
 import book.StackProxy;
 import exceptions.CodeNotSupportedException;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DefaultActions {
 
@@ -71,9 +72,8 @@ public class DefaultActions {
 
 
         addAction(ActionFactory.makeAction('.', b -> {
-            int y = b.stack().pop();
-            int x = b.stack().pop();
-            b.gotoMethod(new Location(x, y));
+            int identifier = b.stack().pop();
+            b.executeMethod(identifier);
         }));
 
         addAction(ActionFactory.makeAction(',', b -> {
@@ -94,6 +94,7 @@ public class DefaultActions {
             b.movePointer(b.currentPointer().over(1, b.currentDirection()));
         }));
     }
+
 
     public static void addAction (CharacterAction action) {
         actions.put(action.getAssociatedCharacter(), action);
