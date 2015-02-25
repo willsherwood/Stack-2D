@@ -22,9 +22,7 @@ public class Main {
             process(out);
             return;
         }
-
-        SwingUtilities.invokeLater(()->new BookDesigner());
-
+        SwingUtilities.invokeLater(BookDesigner::new);
     }
 
     public static void process (char[][] p) {
@@ -38,5 +36,6 @@ public class Main {
                 if (x < p[y].length)
                     b.addCode(new Location(x, y), p[y][x]);
         b.start();
+        while(b.step());
     }
 }

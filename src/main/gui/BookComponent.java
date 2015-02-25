@@ -62,7 +62,7 @@ public class BookComponent extends JComponent {
                 StackVisualizationComponent stackVisualizationComponent = new StackVisualizationComponent();
                 panel.add(stackVisualizationComponent);
                 frame.pack();
-                frame.setLocationRelativeTo(this);
+                frame.setLocation(0, 0);
                 frame.setVisible(true);
                 while(book.step()) {
                     pointer = book.currentPointer();
@@ -74,6 +74,7 @@ public class BookComponent extends JComponent {
                     paint(getGraphics());
                     stackVisualizationComponent.paint(frame.getGraphics(), book.stack().contents());
                 }
+                frame.dispose();
             });
             return;
         } else if (keyCode == KeyEvent.VK_CONTROL) {
