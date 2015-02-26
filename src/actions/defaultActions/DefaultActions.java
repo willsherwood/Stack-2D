@@ -63,6 +63,7 @@ public class DefaultActions {
         addAction(new NullAction('s'));
         addAction(new NullAction(' '));
         addAction(new NullAction((char) 0));
+        addAction(new NullAction(('.')));
 
         addAction(ActionFactory.makeAction('t', b -> {
             int y = b.stack().pop();
@@ -70,15 +71,7 @@ public class DefaultActions {
             b.movePointer(new Location(x, y));
         }));
 
-
-        addAction(ActionFactory.makeAction('.', b -> {
-            int identifier = b.stack().pop();
-            b.executeMethod(identifier);
-        }));
-
-        addAction(ActionFactory.makeAction(',', b -> {
-            b.finishMethod();
-        }));
+        addAction(ActionFactory.makeAction(',', b -> b.finishMethod()));
 
         addAction(ActionFactory.makeAction('"', b -> {
             b.inputString();
@@ -90,9 +83,8 @@ public class DefaultActions {
         addAction(new DirectionalAction('<', Direction.LEFT));
         addAction(new DirectionalAction('>', Direction.RIGHT));
 
-        addAction(ActionFactory.makeAction('#', b -> {
-            b.movePointer(b.currentPointer().over(1, b.currentDirection()));
-        }));
+        addAction(ActionFactory.makeAction('#', b -> b.movePointer(b.currentPointer().over(1, b.currentDirection()))));
+        addAction(ActionFactory.makeAction('`', b -> b.executeMethod(b.stack().pop())));
     }
 
 

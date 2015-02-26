@@ -17,4 +17,8 @@ public class Method {
     public Location getLocation() {
         return loc;
     }
+
+    public int getArity() {
+        return arity;
+    }
 }

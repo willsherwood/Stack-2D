@@ -3,10 +3,9 @@ package book;
 import actions.defaultActions.DefaultActions;
 import exceptions.NoStartingPointException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 /**
  * A book bound by a width and a height
@@ -24,20 +23,19 @@ public class BoundedBook extends Book {
 
     private boolean gettingNumber;
     private boolean gettingString;
+    private Stack<StackState> stackFrame;
 
-    private List<Location> previousLocations;
-
-    public BoundedBook (int width, int height) {
+    public BoundedBook(int width, int height) {
         this.width = width;
         this.height = height;
         stackProxy = new StackProxy();
         codes = new char[height][width];
-        previousLocations = new ArrayList<>();
         methods = new HashMap<>();
     }
 
     @Override
-    public void start () {
+    public void start() {
+        stackFrame = new Stack<>();
         movePointer(startingPoint());
         switchDirection(Direction.RIGHT);
         for (int y = 0; y < height; y++)
@@ -48,47 +46,69 @@ public class BoundedBook extends Book {
 
     @Override
     public void executeMethod(int identifier) {
-        System.out.println(String.format("Tried to execute %d in direction %s.%n", identifier, direction));
+        Stack<Object> stack = new Stack<>();
+        Method m = methods.get(identifier).get(direction); //TODO: NullPointerException for invalid identifiers
+        if (m == null)
+            m = methods.entrySet().iterator().next().getValue().entrySet().iterator().next().getValue();
+        int i = m.getArity();
+        while (i-- > 0)
+            stack.push(stack().pop());
+        System.out.println(stack);
+        stackFrame.push(new StackState(m.getLocation(), stack));
+        System.out.println(stack());
+        pointer = m.getLocation();
     }
 
     private void addMethod(int x, int y) {
+        main:
         for (Direction d : Direction.values()) {
             Location p = new Location(x, y).over(1, d);
+            if (!locationInBounds(p))
+                continue main;
             if (!Character.isDigit(codes[p.y][p.x]))
                 continue;
             int identifier = 0;
             while (Character.isDigit(codes[p.y][p.x])) {
-                identifier = identifier * 10 + codes[p.y][p.x];
+                identifier = identifier * 10 + (codes[p.y][p.x] - 48);
+                p = p.over(1, d);
+                if (!locationInBounds(p))
+                    continue main;
             }
             p = new Location(p.x, p.y).over(1, d);
+            if (!locationInBounds(p))
+                continue main;
             int arity = 0;
             if (!Character.isDigit(codes[p.y][p.x]))
                 continue;
             while (Character.isDigit(codes[p.y][p.x])) {
-                arity = arity * 10 + codes[p.y][p.x];
+                arity = arity * 10 + (codes[p.y][p.x] - 48);
+                p = p.over(1, d);
+                if (!locationInBounds(p))
+                    continue main;
             }
             Method method = new Method(arity, new Location(x, y));
             methods.putIfAbsent(identifier, new HashMap<>());
             methods.get(identifier).put(d, method);
+            System.out.println("added " + identifier + " with arity " + arity);
         }
     }
 
     @Override
-    public void pushOutput (Object pop) {
+    public void pushOutput(Object pop) {
         System.out.println(pop);
     }
 
-    public boolean step () {
+    public boolean step() {
         process(codes[pointer.y][pointer.x]);
         movePointer(pointer.over(1, direction));
         return locationInBounds(pointer);
     }
 
-    private boolean locationInBounds (Location loc) {
+    private boolean locationInBounds(Location loc) {
         return loc.x >= 0 && loc.x < width && loc.y >= 0 && loc.y < height;
     }
 
-    private void process (char c) {
+    private void process(char c) {
         if (gettingString) {
             if (c == '"')
                 gettingString = false;
@@ -108,7 +128,7 @@ public class BoundedBook extends Book {
         DefaultActions.getAction(c).process(this);
     }
 
-    private void getNumber (char c) {
+    private void getNumber(char c) {
         if (gettingNumber) {
             int current = stackProxy.pop();
             stackProxy.push(current * 10 + (c - 48));
@@ -118,7 +138,7 @@ public class BoundedBook extends Book {
         stackProxy.push(c - 48);
     }
 
-    private Location startingPoint () {
+    private Location startingPoint() {
         for (int y = 0; y < height; y++)
             for (int x = 0; x < width; x++)
                 if (codes[y][x] == 's')
@@ -127,48 +147,45 @@ public class BoundedBook extends Book {
     }
 
     @Override
-    public void addCode (Location loc, char c) {
+    public void addCode(Location loc, char c) {
         codes[loc.y][loc.x] = c;
     }
 
     @Override
-    public void movePointer (Location loc) {
+    public void movePointer(Location loc) {
         this.pointer = loc;
     }
 
     @Override
-    public void switchDirection (Direction direction) {
+    public void switchDirection(Direction direction) {
         this.direction = direction;
     }
 
     @Override
-    public StackProxy stack () {
-        return stackProxy;
+    public StackProxy stack() {
+        if (stackFrame.isEmpty())
+            return stackProxy;
+        return stackFrame.peek().stack();
     }
 
     @Override
-    public void gotoMethod (Location location) {
-        previousLocations.add(pointer);
-        movePointer(location.over(-1, direction));
+    public void finishMethod() {
+        pointer = stackFrame.peek().getLocation();
+        stack().addAll(stackFrame.pop().stack()); // unconsumed arguments will be restored to stack
     }
 
     @Override
-    public void finishMethod () {
-        movePointer(previousLocations.remove(previousLocations.size() - 1));
-    }
-
-    @Override
-    public void inputString () {
+    public void inputString() {
         gettingString = true;
     }
 
     @Override
-    public Location currentPointer () {
+    public Location currentPointer() {
         return pointer;
     }
 
     @Override
-    public Direction currentDirection () {
+    public Direction currentDirection() {
         return direction;
     }
 }
